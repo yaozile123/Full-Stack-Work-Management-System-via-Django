@@ -25,7 +25,6 @@ idna==3.4
 jmespath==1.0.1
 jsonschema==3.2.0
 mysqlclient==2.1.1
-numpy==1.24.2
 pandas==1.5.3
 paramiko==3.1.0
 pathspec==0.10.1
