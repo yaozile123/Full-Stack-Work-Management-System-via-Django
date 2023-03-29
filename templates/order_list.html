@@ -1,0 +1,230 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px">
+            <div>
+                <input type="button" value="新建订单" class="btn btn-success" id="btnAdd">
+
+                <div class="col-lg-4" style="float: right">
+                    <form method="get">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search for..." name="query"
+                                   value={{ value }}>
+                            <span class="input-group-btn">
+        <button class="btn btn-default" type="submit">搜索</button>
+      </span>
+                        </div>
+                    </form><!-- /input-group --></div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">订单列表</div>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>订单号</th>
+                    <th>商品名称</th>
+                    <th>价格</th>
+                    <th>状态</th>
+                    <th>用户ID</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for query in query_set %}
+                    <tr>
+                        <th scope="row">{{ query.id }}</th>
+                        <td>{{ query.order_number }}</td>
+                        <td>{{ query.name }}</td>
+                        <td>{{ query.price }}</td>
+                        <td>{{ query.get_status_display }}</td>
+                        <td>{{ query.customer_id.username }}</td>
+                        <td><input uid={{ query.id }} type="button" class="btn btn-primary btn-xs btn-edit"
+                                   value="编辑">
+                            <input uid={{ query.id }} type="button" class="btn btn-danger btn-xs btn-delete"
+                                   value="删除">
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination">
+        <span class="step-links">
+            {% if query_set.has_previous %}
+                <a href="?query={{ value }}&page=1">&laquo; first</a>
+                <a href="?query={{ value }}&page={{ query_set.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ query_set.number }} of {{ query_set.paginator.num_pages }}.
+            </span>
+
+            {% if query_set.has_next %}
+                <a href="?query={{ value }}&page={{ query_set.next_page_number }}">next</a>
+                <a href="?query={{ value }}&page={{ query_set.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+        </div>
+    </div>
+    <div>
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">新建任务</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="clearfix">
+                            <form id="modalForm">
+                                {% for item in form %}
+                                    <div style="margin-bottom: 18px">
+                                        <div class="form-group" style="position: relative">
+                                            <label>{{ item.label }}</label>
+                                            {{ item }}
+                                            <span class="error_msg" style="position: absolute; color: red"></span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="btnSubmit">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                    <h4>Are you sure you want to delete?</h4>
+                    <p>After deletion, all associated data will be deleted as well.</p>
+                    <p>
+                        <button type="button" id="btnConfirmDelete" class="btn btn-danger">Confirm</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        let delete_id;
+        let edit_id = -1;
+        $(function () {
+            showModal();
+            submitModal();
+            showDeleteModal();
+            showEditModal();
+            btnDelete();
+        })
+
+        function showModal() {
+            $("#btnAdd").click(function () {
+                $('#modalForm')[0].reset();
+                $("#myModalLabel").text("新建任务");
+                $('#myModal').modal('show');
+            })
+        }
+
+        function submitModal() {
+            $("#btnSubmit").click(function () {
+                $(".error_msg").empty();
+                let current_url;
+                if (edit_id == -1) {
+                    current_url = "/order/add/";
+                } else {
+                    current_url = "/order/edit/?uid=" + edit_id;
+                    edit_id = -1;
+                }
+                $.ajax({
+                    url: current_url,
+                    type: "post",
+                    data: $("#modalForm").serialize(),
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            alert("success");
+                            $('#myModal').modal('hide');
+                            location.reload();
+                        } else {
+                            $.each(res.error, function (name, data) {
+                                {#django modelform会自动生成id, id = id_ + label#}
+                                $("#id_" + name).next().text(data[0]);
+                            })
+
+                        }
+                    }
+                })
+            })
+        }
+
+        function showDeleteModal() {
+            $(".btn-delete").click(function () {
+                delete_id = $(this).attr("uid");
+                $('#deleteModal').modal('show');
+            })
+        }
+
+        function btnDelete() {
+            $("#btnConfirmDelete").click(function () {
+                $.ajax({
+                    url: "/order/delete/",
+                    type: "GET",
+                    data: {"uid": delete_id},
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            alert("Delete Successfully!")
+                            $('#deleteModal').modal('hide');
+                            delete_id = -1;
+                            location.reload();
+                        } else {
+                            alert(res.error);
+                        }
+                    }
+                })
+            })
+        }
+
+        function showEditModal() {
+            $(".btn-edit").click(function () {
+                $('#modalForm')[0].reset();
+                edit_id = $(this).attr("uid");
+                $("#myModalLabel").text("编辑任务");
+                $.ajax({
+                    url: "/order/detail/",
+                    type: "get",
+                    data: {"uid": edit_id},
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            $.each(res.data, function (name, data) {
+                                if (name == "customer_id") {
+                                    console.log(data);
+                                    $("#id_customer_id").val(data);
+                                } else {
+                                    $("#id_" + name).val(data);
+                                }
+                            })
+                            $("#myModal").modal('show');
+                        } else {
+                            alert(res.error);
+                        }
+                    }
+                })
+            })
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'plugins/bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <title>Login</title>
+</head>
+<body>
+<div class="container" style="width: 500px; border: 1px solid #dddddd;margin-top: 80px;">
+    <form method="post" style="margin-top: 60px;margin-bottom: 60px" novalidate>
+        {% csrf_token %}
+        <h2 style="text-align: center"> 用户登录</h2>
+        <div class="mb-2">
+            <label for="exampleInputEmail1" class="form-label">{{ form.username.label }}</label>
+            {{ form.username }}
+            <span style="margin-left: 10px; color: red">{{ form.username.errors.0 }}</span>
+        </div>
+        <div class="mb-2">
+            <label for="exampleInputEmail1" class="form-label">{{ form.password.label }}</label>
+            {{ form.password }}
+            <span style="margin-left: 10px; color: red">{{ form.password.errors.0 }}</span>
+        </div>
+        <div class="mb-2">
+            <label for="exampleInputEmail1" class="form-label">{{ form.captcha.label }}</label>
+            <div>
+            {{ form.captcha }}
+            <button type="button" class="btn btn-primary captcha-btn" style="margin-left: 20px">Refresh</button></div>
+            <span style="margin-left: 10px; color: red">{{ form.captcha.errors.0 }}</span>
+        </div>
+{#        <div class="mb-3 form-check">#}
+{#            <input type="checkbox" class="form-check-input" id="exampleCheck1">#}
+{#            <label class="form-check-label" for="exampleCheck1">Check me out</label>#}
+{#        </div>#}
+        <button type="submit" class="btn btn-primary">登录</button>
+        <button type="submit" class="btn btn-primary">注册</button>
+    </form>
+</div>
+</body>
+
+<!-- Bootstrap Bundle with Popper -->
+<script src="{% static 'plugins/bootstrap-5.3.0-alpha1-dist/js/bootstrap.bundle.js' %}"></script>
+<script src="{% static 'js/jquery-3.6.3.js' %}"></script>
+<script>
+    $('.captcha-btn').click(function () {
+    $.getJSON("/captcha/refresh/", function (result) {
+        $('.captcha').attr('src', result['image_url']);
+        $('#id_captcha_0').val(result['key'])
+    });
+});
+</script>
+</body>
+</html>

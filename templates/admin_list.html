@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px">
+            <a class="btn btn-success" href="/admin_user/add/">新增管理员</a>
+            <div class="col-lg-4" style="float: right">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for..." name="query"
+                               value={{ value }}>
+                        <span class="input-group-btn">
+        <button class="btn btn-default" type="submit">搜索</button>
+      </span>
+                    </div>
+                </form><!-- /input-group --></div>
+
+
+        </div>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">管理员列表</div>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>账号</th>
+                    <th>密码</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for query in query_set %}
+                    <tr>
+                        <th scope="row">{{ query.id }}</th>
+                        <td>{{ query.username}}</td>
+                        <td>{{ query.password }}</td>
+                        <td><a class="btn btn-primary btn-xs" href="/admin_user/{{ query.id }}/edit/">编辑</a>
+                            <a class="btn btn-danger btn-xs" href="/admin_user/{{ query.id }}/delete/">删除</a>
+                            <a class="btn btn-primary btn-xs" href="/admin_user/{{ query.id }}/reset/">重置</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination">
+        <span class="step-links">
+            {% if query_set.has_previous %}
+                <a href="?query={{ value }}&page=1">&laquo; first</a>
+                <a href="?query={{ value }}&page={{ query_set.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ query_set.number }} of {{ query_set.paginator.num_pages }}.
+            </span>
+
+            {% if query_set.has_next %}
+                <a href="?query={{ value }}&page={{ query_set.next_page_number }}">next</a>
+                <a href="?query={{ value }}&page={{ query_set.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+        </div>
+    </div>
+{% endblock %}

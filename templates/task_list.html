@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">任务列表</div>
+            <div class="panel-body">
+                <form id="addForm">
+                    <div class="clearfix">
+                        {% for item in form %}
+                            <div class="col-xs-6" style="margin-bottom: 18px">
+                                <div class="form-group" style="position: relative">
+                                    <label>{{ item.label }}</label>
+                                    {{ item }}
+                                    <span class="error_msg" style="position: absolute; color: red"></span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" id="btnAdd" class="btn btn-default">提交</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+    $(function (){
+        btnAddEvent();
+    })
+
+    function btnAddEvent() {
+        $("#btnAdd").click(function (){
+            $(".error_msg").empty();
+            $.ajax({
+                url: "/task/add/",
+                type: "post",
+                data:$("#addForm").serialize(),
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        alert("Success!")
+                    } else {
+                        $.each(res.error, function (name, data){
+                            {#django modelform会自动生成id, id = id_ + label#}
+                            console.log("#id_"+name);
+                            $("#id_"+name).next().text(data[0]);
+                        })
+                    }
+                }
+            })
+        })
+    }
+    </script>
+{% endblock %}
