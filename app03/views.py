@@ -91,7 +91,7 @@ def admin_list(request):
 
 
 class AdminModelForm(BootStrapModelForm):
-    confirm = forms.CharField(label="确认密码")
+    confirm = forms.CharField(label="Confirm password")
 
     class Meta:
         model = Admin

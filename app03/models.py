@@ -12,8 +12,8 @@ class Account(models.Model):
 
 
 class Admin(models.Model):
-    username = models.CharField(verbose_name="管理员账号", max_length=32)
-    password = models.CharField(verbose_name="管理员密码", max_length=32)
+    username = models.CharField(verbose_name="username", max_length=32)
+    password = models.CharField(verbose_name="password", max_length=32)
 
     def __str__(self):
         return self.username

@@ -12,6 +12,7 @@ from utils.Form import BootStrapForm
 from utils.ModelForm import BootStrapModelForm
 from utils.encrypt import md5
 from app03.models import Admin
+from app03.views import AdminModelForm
 from captcha.fields import CaptchaField
 from django.core.validators import ValidationError
 from datetime import datetime
@@ -221,3 +222,15 @@ def order_edit(request):
         return HttpResponse(json.dumps(dct))
     dct = {"status": False, "error": form.errors}
     return HttpResponse(json.dumps(dct))
+
+
+def register(request):
+    form = AdminModelForm()
+    if request.method == "GET":
+        return render(request, "register.html", {"form": form})
+    form = AdminModelForm(data=request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect("/login/")
+    return render(request, "register.html", {"form": form})
+

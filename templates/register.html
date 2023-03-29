@@ -15,7 +15,7 @@
 <div class="container" style="width: 500px; border: 1px solid #dddddd;margin-top: 80px;">
     <form method="post" style="margin-top: 60px;margin-bottom: 60px" novalidate>
         {% csrf_token %}
-        <h2 style="text-align: center"> 用户登录</h2>
+        <h2 style="text-align: center"> New User</h2>
         <div class="mb-2">
             <label for="exampleInputEmail1" class="form-label">{{ form.username.label }}</label>
             {{ form.username }}
@@ -27,15 +27,13 @@
             <span style="margin-left: 10px; color: red">{{ form.password.errors.0 }}</span>
         </div>
         <div class="mb-2">
-            <label for="exampleInputEmail1" class="form-label">{{ form.captcha.label }}</label>
+            <label for="exampleInputEmail1" class="form-label">{{ form.confirm.label }}</label>
             <div>
-                {{ form.captcha }}
-                <button type="button" class="btn btn-primary captcha-btn" style="margin-left: 20px">Refresh</button>
+                {{ form.confirm }}
             </div>
-            <span style="margin-left: 10px; color: red">{{ form.captcha.errors.0 }}</span>
+            <span style="margin-left: 10px; color: red">{{ form.confirm.errors.0 }}</span>
         </div>
-        <button type="submit" class="btn btn-primary">登录</button>
-        <a class="btn btn-primary" href="/register/">register</a>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
 </body>
@@ -43,12 +41,4 @@
 <!-- Bootstrap Bundle with Popper -->
 <script src="{% static 'plugins/bootstrap-5.3.0-alpha1-dist/js/bootstrap.bundle.js' %}"></script>
 <script src="{% static 'js/jquery-3.6.3.js' %}"></script>
-<script>
-    $('.captcha-btn').click(function () {
-        $.getJSON("/captcha/refresh/", function (result) {
-            $('.captcha').attr('src', result['image_url']);
-            $('#id_captcha_0').val(result['key'])
-        });
-    });
-</script>
 </html>
