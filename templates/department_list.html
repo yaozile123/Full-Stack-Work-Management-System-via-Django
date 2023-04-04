@@ -2,17 +2,17 @@
 {% block content %}
     <div class="container">
         <div style="margin-bottom: 10px">
-            <a class="btn btn-success" href="/department/add/">新建部门</a>
+            <input type="button" value="Add New Department" class="btn btn-success" id="btnAdd">
         </div>
         <div class="panel panel-default">
             <!-- Default panel contents -->
-            <div class="panel-heading">部门列表</div>
+            <div class="panel-heading">Department</div>
             <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>部门名称</th>
-                    <th>操作</th>
+                    <th>Department</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -20,8 +20,10 @@
                     <tr>
                         <th scope="row">{{ query.id }}</th>
                         <td>{{ query.department }}</td>
-                        <td><a class="btn btn-primary btn-xs" href="/{{ query.id }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/delete/?uid={{ query.id }}">删除</a>
+                        <td><input uid={{ query.id }} type="button" class="btn btn-primary btn-xs btn-edit"
+                                   value="Edit">
+                            <input uid={{ query.id }} type="button" class="btn btn-danger btn-xs btn-delete"
+                                   value="Delete">
                         </td>
                     </tr>
                 {% endfor %}
@@ -29,4 +31,154 @@
             </table>
         </div>
     </div>
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <h4>Are you sure you want to delete?</h4>
+                <p>After deletion, all associated data will be deleted as well.</p>
+                <p>
+                    <button type="button" id="btnConfirmDelete" class="btn btn-danger">Confirm</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add New Department</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="clearfix">
+                        <form id="modalForm">
+                            {% for item in form %}
+                                <div style="margin-bottom: 18px">
+                                    <div class="form-group" style="position: relative">
+                                        <label>{{ item.label }}</label>
+                                        {{ item }}
+                                        <span class="error_msg" style="position: absolute; color: red"></span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnSubmit">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        $(function () {
+            showAddModal();
+            showDeleteModal();
+            showEditModal();
+            btnAdd();
+            btnDelete();
+        })
+        let edit_id = -1;
+        let delete_id = -1;
+
+        function showAddModal() {
+            $(".error_msg").empty();
+            $('#btnAdd').click(function () {
+                $('#modalForm')[0].reset();
+                $("#myModalLabel").text("Add New Department");
+                $('#myModal').modal('show');
+            })
+        }
+
+        function showDeleteModal() {
+            $('.btn-delete').click(function () {
+                delete_id = $(this).attr("uid");
+                $("#deleteModal").modal('show');
+            })
+        }
+
+        function showEditModal() {
+            $('.btn-edit').click(function () {
+                edit_id = $(this).attr("uid");
+                $('#modalForm')[0].reset();
+                $("#myModalLabel").text("Edit Department");
+                console.log(edit_id);
+                $.ajax({
+                    url: "/department/detail/",
+                    type: "get",
+                    data: {"uid": edit_id},
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            console.log(res.data);
+                            $.each(res.data, function (name, data) {
+                                console.log(name);
+                                console.log(data);
+                                $("#id_" + name).val(data);
+                            })
+                            $('#myModal').modal('show');
+                        } else {
+                            alert(res.error);
+                        }
+                    }
+                })
+            })
+        }
+
+        function btnAdd() {
+            $('#btnSubmit').click(function () {
+                $(".error_msg").empty();
+                let current_url;
+                if (edit_id == -1) {
+                    current_url = "/department/add/";
+                } else {
+                    current_url = "/department/edit/?uid=" + edit_id;
+                    edit_id = -1;
+                }
+                $.ajax({
+                    url: current_url,
+                    type: "post",
+                    data: $("#modalForm").serialize(),
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            alert("success");
+                            $('#myModal').modal('hide');
+                            location.reload();
+                        } else {
+                            $.each(res.error, function (name, data) {
+                                $("#id_" + name).next().text(data[0]);
+                            })
+                        }
+                    }
+                })
+            })
+        }
+
+        function btnDelete() {
+            $("#btnConfirmDelete").click(function () {
+                $.ajax({
+                    url: "/department/delete/",
+                    type: "GET",
+                    data: {"uid": delete_id},
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            alert("Delete Successfully!")
+                            $('#deleteModal').modal('hide');
+                            delete_id = -1;
+                            location.reload();
+                        } else {
+                            alert(res.error);
+                        }
+                    }
+                })
+            })
+        }
+    </script>
 {% endblock %}

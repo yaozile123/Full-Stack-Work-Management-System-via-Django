@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse, redirect
 from django.views.decorators.csrf import csrf_exempt
 
-from app02.models import Department, Employee, Task, Order
+from app02.models import Department, Employee, Task, Order, Customer
 from django import forms
 from utils.Form import BootStrapForm
 from utils.ModelForm import BootStrapModelForm
@@ -17,40 +17,66 @@ from captcha.fields import CaptchaField
 from django.core.validators import ValidationError
 from datetime import datetime
 
-
 # Create your views here.
-def add(request):
-    Department.objects.create(department="干饭部门")
-    return HttpResponse("添加成功")
+PASSWORD = "12345"
 
 
 def department_list(request):
+    form = DepartmentModelForm()
     query_set = Department.objects.all().order_by("id")
-    return render(request, "department_list.html", {'query_set': query_set})
+    return render(request, "department_list.html", {'query_set': query_set, "form": form})
 
 
-def delete(request):
+def department_delete(request):
     uid = request.GET.get("uid")
-    Department.objects.filter(id=uid).delete()
-    return redirect("/department/list/")
+    flag = Department.objects.filter(id=uid).exists()
+    if flag:
+        Department.objects.filter(id=uid).delete()
+        return JsonResponse({"status": True})
+    return JsonResponse({"status": False, "error": "data not exist"})
 
 
+@csrf_exempt
 def department_add(request):
-    if request.method == "GET":
-        return render(request, "department_add.html")
-    else:
-        newDepartment = request.POST.get("department")
-        Department.objects.create(department=newDepartment)
-        return redirect("/department/list/")
+    form = DepartmentModelForm(data=request.POST)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({"status": True})
+    return JsonResponse({"status": False, "error": form.errors})
 
 
-def department_edit(request, uid):
-    if request.method == "GET":
-        row_element = Department.objects.filter(id=uid).first()
-        return render(request, "department_edit.html", {"element": row_element})
-    new_department = request.POST.get("department")
-    Department.objects.filter(id=uid).update(department=new_department)
-    return redirect("/department/list/")
+@csrf_exempt
+def department_edit(request):
+    uid = request.GET.get("uid")
+    query_object = Department.objects.filter(id=uid).first()
+    form = DepartmentModelForm(data=request.POST, instance=query_object)
+    if query_object and form.is_valid():
+        form.save()
+        return JsonResponse({"status": True})
+    return JsonResponse({"status": False, "error": form.errors})
+
+
+def department_detail(request):
+    uid = request.GET.get("uid")
+    flag = Department.objects.filter(id=uid).exists()
+    if flag:
+        query = Department.objects.filter(id=uid).first()
+        return JsonResponse({"status": True, "data": {"department": query.department}})
+    return JsonResponse({"status": False, "error": "data not exist"})
+
+
+class DepartmentModelForm(BootStrapModelForm):
+    class Meta:
+        model = Department
+        fields = '__all__'
+
+    def clean_department(self):
+        department = self.cleaned_data["department"]
+        # 排除自己本身并检测有没有相同的手机号
+        exists = Department.objects.exclude(id=self.instance.pk).filter(department=department).exists()
+        if exists:
+            raise ValidationError("Department already exists")
+        return department
 
 
 def user_list(request):
@@ -75,12 +101,12 @@ class UserModelForm(forms.ModelForm):
 def user_add(request):
     form = UserModelForm()
     if request.method == "GET":
-        return render(request, "add_edit.html", {"form": form, "title": "新增用户"})
+        return render(request, "add_edit.html", {"form": form, "title": "Add New Employee"})
     form = UserModelForm(data=request.POST)
     if form.is_valid():
         form.save()
         return redirect('/user/list/')
-    return render(request, "add_edit.html", {"form": form, "title": "新增用户"})
+    return render(request, "add_edit.html", {"form": form, "title": "Add New Employee"})
 
 
 def user_delete(request, uid):
@@ -92,13 +118,13 @@ def user_edit(request, uid):
     row_object = Employee.objects.filter(id=uid).first()
     form = UserModelForm(instance=row_object)
     if request.method == "GET":
-        return render(request, "add_edit.html", {"form": form, "title": "编辑用户"})
+        return render(request, "add_edit.html", {"form": form, "title": "Edit Employee"})
     row_object = Employee.objects.filter(id=uid).first()
     form = UserModelForm(data=request.POST, instance=row_object)
     if form.is_valid():
         form.save()
         return redirect("/user/list/")
-    return render(request, "add_edit.html", {"form": form, "title": "编辑用户"})  # 把报错信息显示出来
+    return render(request, "add_edit.html", {"form": form, "title": "Edit Employee"})  # 把报错信息显示出来
 
 
 def login(request):
@@ -113,16 +139,16 @@ def login(request):
         if user:
             # 网站生成随机字符串 写入到cookie中再写入到session中
             request.session['info'] = {"ID": user.pk, "username": user.username}
-            return redirect("/admin_user/list/")
+            return redirect("/user/list/")
         else:
-            form.add_error("password", "用户名或密码错误")
+            form.add_error("password", "Invalid Username/Password")
     return render(request, "login.html", {"form": form})
 
 
 class LoginForm(BootStrapForm):
-    username = forms.CharField(label="用户名", widget=forms.TextInput)
-    password = forms.CharField(label="密码", widget=forms.PasswordInput)
-    captcha = CaptchaField(label="验证码", output_format=u'%(image)s %(hidden_field)s %(text_field)s')
+    username = forms.CharField(label="Username", widget=forms.TextInput)
+    password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    captcha = CaptchaField(label="Enter Captcha", output_format=u'%(image)s %(hidden_field)s %(text_field)s')
 
     def clean_password(self):
         return md5(self.cleaned_data.get("password"))
@@ -234,3 +260,83 @@ def register(request):
         return redirect("/login/")
     return render(request, "register.html", {"form": form})
 
+
+@csrf_exempt
+def verify(request):
+    if request.method == "GET":
+        form = VerificationForm()
+        return render(request, "verification.html", {"form": form})
+    form = VerificationForm(data=request.POST)
+    if form.is_valid():
+        request.session["admin_user"] = True
+        return redirect("/admin_user/list/")
+    return render(request, "verification.html", {'form': form})
+
+
+class VerificationForm(BootStrapForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password'}))
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if password != PASSWORD:
+            raise ValidationError('Incorrect password')
+        return password
+
+
+def customer_list(request):
+    value = request.GET.get("query", "")
+    dct = {}
+    if value:
+        dct["username__contains"] = value
+    result_set = Customer.objects.filter(**dct)
+    paginator = Paginator(result_set, 20)
+    page = request.GET.get("page")
+    try:
+        result_set = paginator.page(page)
+    except PageNotAnInteger:
+        result_set = paginator.page(1)
+    except EmptyPage:
+        result_set = paginator.page(paginator.num_pages)
+    return render(request, "customer_list.html", {"query_set": result_set, "value": value})
+
+
+class CustomerModelForm(BootStrapModelForm):
+    class Meta:
+        model = Customer
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if name == "birthdate":  # 修改成日期选择框
+                field.widget = forms.DateInput(attrs={'type': 'date'})
+                field.widget.attrs = {"class": "form-control", "placeholder": field.label}
+
+
+def customer_add(request):
+    form = CustomerModelForm()
+    if request.method == "GET":
+        return render(request, "add_edit.html", {"form": form, "title": "Add New Customer"})
+    form = CustomerModelForm(data=request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect("/customer/list/")
+    return render(request, "add_edit.html", {"form": form, "title": "Add New Customer"})
+
+
+def customer_edit(request, uid):
+    query_object = Customer.objects.filter(id=uid).first()
+    form = CustomerModelForm(instance=query_object)
+    if request.method == "GET":
+        return render(request, "add_edit.html", {"form": form, "title": "Add New Customer"})
+    form = CustomerModelForm(data=request.POST, instance=query_object)
+    if form.is_valid():
+        form.save()
+        return redirect("/customer/list/")
+    return render(request, "add_edit.html", {"form": form, "title": "Add New Customer"})
+
+
+def customer_delete(request, uid):
+    Customer.objects.filter(id=uid).delete()
+    return redirect("/customer/list/")

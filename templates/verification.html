@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="container">
+        <form method="post" novalidate>
+            <div class="panel panel-default">
+                <div class="panel-heading">Please enter the password for admin page</div>
+                {% for item in form %}
+                    <div style="margin-top: 8px;margin-left: 15px">{{ item.label }}</div>
+
+                    <div class="col-xs-6">
+                        {{ item }}</div>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                    <span style="margin-left: 50px; color: red">{{ item.errors.0 }}</span>
+                {% endfor %}
+                <div style="clear: both"></div>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}

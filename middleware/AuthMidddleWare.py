@@ -10,5 +10,13 @@ class AuthMiddleWare(MiddlewareMixin):
             return
         data = request.session.get("info")
         if data:
+            if request.path_info == "/":
+                return redirect("/user/list/")
+            if "admin_user" in request.path_info:
+                tmp = request.session.get("admin_user")
+                if tmp:
+                    return
+                else:
+                    return redirect("/verify/")
             return
         return redirect("/login/")

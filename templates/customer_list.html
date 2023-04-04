@@ -2,44 +2,46 @@
 {% block content %}
     <div class="container">
         <div style="margin-bottom: 10px">
-            <a class="btn btn-success" href="/account/add/">新增靓号</a>
-            <div class="col-lg-4" style="float: right">
-                <form method="get">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for..." name="query"
-                               value={{ value }}>
-                        <span class="input-group-btn">
-        <button class="btn btn-default" type="submit">搜索</button>
+            <div>
+                <a class="btn btn-success" href="/customer/add/">Add New Customer</a>
+
+                <div class="col-lg-4" style="float: right">
+                    <form method="get">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search for..." name="query"
+                                   value={{ value }}>
+                            <span class="input-group-btn">
+        <button class="btn btn-default" type="submit">Search</button>
       </span>
-                    </div>
-                </form><!-- /input-group --></div>
-
-
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
         <div class="panel panel-default">
             <!-- Default panel contents -->
-            <div class="panel-heading">账户列表</div>
+            <div class="panel-heading">Order</div>
             <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>账号</th>
-                    <th>价格</th>
-                    <th>等级</th>
-                    <th>状态</th>
-                    <th>操作</th>
+                    <th>Username</th>
+                    <th>Birthdate</th>
+                    <th>Age</th>
+                    <th>Level</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for query in query_set %}
                     <tr>
                         <th scope="row">{{ query.id }}</th>
-                        <td>{{ query.mobile }}</td>
-                        <td>{{ query.price }}</td>
+                        <td>{{ query.username }}</td>
+                        <td>{{ query.birthdate }}</td>
+                        <td>{{ query.age }}</td>
                         <td>{{ query.get_level_display }}</td>
-                        <td>{{ query.get_status_display }}</td>
-                        <td><a class="btn btn-primary btn-xs" href="/account/{{ query.id }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/account/{{ query.id }}/delete/">删除</a>
+                        <td><a class="btn btn-primary btn-xs" href="/customer/{{ query.id }}/edit/">Edit</a>
+                            <a class="btn btn-danger btn-xs" href="/customer/{{ query.id }}/delete/">Delete</a>
                         </td>
                     </tr>
                 {% endfor %}

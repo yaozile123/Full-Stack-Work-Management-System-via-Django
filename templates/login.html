@@ -10,12 +10,28 @@
     <link href="{% static 'plugins/bootstrap-5.3.0-alpha1-dist/css/bootstrap.min.css' %}" rel="stylesheet">
 
     <title>Login</title>
+    <script>
+        window.onload = function () {
+            var captchaInput = document.getElementById('id_captcha_1');
+            if (captchaInput) {
+                captchaInput.classList.add('form-control');
+            }
+        };
+    </script>
+    <style>
+        #id_captcha_1 {
+            width: 50%;
+            max-width: 250px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body>
-<div class="container" style="width: 500px; border: 1px solid #dddddd;margin-top: 80px;">
-    <form method="post" style="margin-top: 60px;margin-bottom: 60px" novalidate>
+<div class="container" style="width: 450px; border: 1px solid #dddddd;margin-top: 80px;">
+    <form method="post" style="margin-top: 60px;margin-bottom: 60px" id="my-form" novalidate>
         {% csrf_token %}
-        <h2 style="text-align: center"> 用户登录</h2>
+        <h2 style="text-align: center"> Welcome</h2>
         <div class="mb-2">
             <label for="exampleInputEmail1" class="form-label">{{ form.username.label }}</label>
             {{ form.username }}
@@ -34,8 +50,8 @@
             </div>
             <span style="margin-left: 10px; color: red">{{ form.captcha.errors.0 }}</span>
         </div>
-        <button type="submit" class="btn btn-primary">登录</button>
-        <a class="btn btn-primary" href="/register/">register</a>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+        <a class="btn btn-primary" href="/register/">Sign Up</a>
     </form>
 </div>
 </body>
@@ -50,5 +66,6 @@
             $('#id_captcha_0').val(result['key'])
         });
     });
+
 </script>
 </html>

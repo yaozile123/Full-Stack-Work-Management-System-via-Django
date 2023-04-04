@@ -16,25 +16,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from app02 import views
-from app03.views import account_show, account_add, account_delete, account_edit, admin_list, admin_add, admin_edit, \
+from app03.views import admin_list, admin_add, admin_edit, \
     admin_delete, admin_reset
 
 urlpatterns = [
     path('captcha/', include('captcha.urls')),
     path('admin/', admin.site.urls),
     path('department/list/', views.department_list),
-    path('add/', views.add),
-    path('delete/', views.delete),
+    path('department/delete/', views.department_delete),
     path('department/add/', views.department_add),
-    path('<int:uid>/edit/', views.department_edit),
+    path('department/edit/', views.department_edit),
+    path('department/detail/', views.department_detail),
     path('user/list/', views.user_list),
     path('user/<int:uid>/delete/', views.user_delete),
     path('user/add/', views.user_add),
     path('user/<int:uid>/edit/', views.user_edit),
-    path('account/list/', account_show),
-    path('account/add/', account_add),
-    path('account/<int:uid>/delete/', account_delete),
-    path('account/<int:uid>/edit/', account_edit),
     path('admin_user/list/', admin_list),
     path('admin_user/add/', admin_add),
     path('admin_user/<int:uid>/edit/', admin_edit),
@@ -49,6 +45,11 @@ urlpatterns = [
     path('order/delete/', views.order_delete),
     path('order/detail/', views.order_detail),
     path('order/edit/', views.order_edit),
-    path('register/', views.register)
+    path('register/', views.register),
+    path('verify/', views.verify),
+    path('customer/list/', views.customer_list),
+    path('customer/add/', views.customer_add),
+    path('customer/<int:uid>/edit/', views.customer_edit),
+    path('customer/<int:uid>/delete/', views.customer_delete),
 
 ]

@@ -3,7 +3,7 @@
     <div class="container">
         <div style="margin-bottom: 10px">
             <div>
-                <input type="button" value="新建订单" class="btn btn-success" id="btnAdd">
+                <input type="button" value="Add New Order" class="btn btn-success" id="btnAdd">
 
                 <div class="col-lg-4" style="float: right">
                     <form method="get">
@@ -11,7 +11,7 @@
                             <input type="text" class="form-control" placeholder="Search for..." name="query"
                                    value={{ value }}>
                             <span class="input-group-btn">
-        <button class="btn btn-default" type="submit">搜索</button>
+        <button class="btn btn-default" type="submit">Search</button>
       </span>
                         </div>
                     </form><!-- /input-group --></div>
@@ -19,17 +19,17 @@
         </div>
         <div class="panel panel-default">
             <!-- Default panel contents -->
-            <div class="panel-heading">订单列表</div>
+            <div class="panel-heading">Order</div>
             <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>订单号</th>
-                    <th>商品名称</th>
-                    <th>价格</th>
-                    <th>状态</th>
-                    <th>用户ID</th>
-                    <th>操作</th>
+                    <th>Order No.</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Customer</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -42,9 +42,9 @@
                         <td>{{ query.get_status_display }}</td>
                         <td>{{ query.customer_id.username }}</td>
                         <td><input uid={{ query.id }} type="button" class="btn btn-primary btn-xs btn-edit"
-                                   value="编辑">
+                                   value="Edit">
                             <input uid={{ query.id }} type="button" class="btn btn-danger btn-xs btn-delete"
-                                   value="删除">
+                                   value="Delete">
                         </td>
                     </tr>
                 {% endfor %}
@@ -77,7 +77,7 @@
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                 aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">新建任务</h4>
+                        <h4 class="modal-title" id="myModalLabel">Add New Order</h4>
                     </div>
                     <div class="modal-body">
                         <div class="clearfix">
@@ -133,7 +133,7 @@
         function showModal() {
             $("#btnAdd").click(function () {
                 $('#modalForm')[0].reset();
-                $("#myModalLabel").text("新建任务");
+                $("#myModalLabel").text("Add New Order");
                 $('#myModal').modal('show');
             })
         }
@@ -202,7 +202,7 @@
             $(".btn-edit").click(function () {
                 $('#modalForm')[0].reset();
                 edit_id = $(this).attr("uid");
-                $("#myModalLabel").text("编辑任务");
+                $("#myModalLabel").text("Edit Order");
                 $.ajax({
                     url: "/order/detail/",
                     type: "get",
@@ -212,7 +212,6 @@
                         if (res.status) {
                             $.each(res.data, function (name, data) {
                                 if (name == "customer_id") {
-                                    console.log(data);
                                     $("#id_customer_id").val(data);
                                 } else {
                                     $("#id_" + name).val(data);

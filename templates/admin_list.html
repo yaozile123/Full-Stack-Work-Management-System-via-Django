@@ -2,14 +2,14 @@
 {% block content %}
     <div class="container">
         <div style="margin-bottom: 10px">
-            <a class="btn btn-success" href="/admin_user/add/">新增管理员</a>
+            <a class="btn btn-success" href="/admin_user/add/">Add New Admin</a>
             <div class="col-lg-4" style="float: right">
                 <form method="get">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search for..." name="query"
                                value={{ value }}>
                         <span class="input-group-btn">
-        <button class="btn btn-default" type="submit">搜索</button>
+        <button class="btn btn-default" type="submit">Search</button>
       </span>
                     </div>
                 </form><!-- /input-group --></div>
@@ -18,14 +18,14 @@
         </div>
         <div class="panel panel-default">
             <!-- Default panel contents -->
-            <div class="panel-heading">管理员列表</div>
+            <div class="panel-heading">Admin</div>
             <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>账号</th>
-                    <th>密码</th>
-                    <th>操作</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -34,9 +34,9 @@
                         <th scope="row">{{ query.id }}</th>
                         <td>{{ query.username}}</td>
                         <td>{{ query.password }}</td>
-                        <td><a class="btn btn-primary btn-xs" href="/admin_user/{{ query.id }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/admin_user/{{ query.id }}/delete/">删除</a>
-                            <a class="btn btn-primary btn-xs" href="/admin_user/{{ query.id }}/reset/">重置</a>
+                        <td><a class="btn btn-primary btn-xs" href="/admin_user/{{ query.id }}/edit/">Edit</a>
+                            <a class="btn btn-danger btn-xs" href="/admin_user/{{ query.id }}/delete/">Delete</a>
+                            <a class="btn btn-primary btn-xs" href="/admin_user/{{ query.id }}/reset/">Reset</a>
                         </td>
                     </tr>
                 {% endfor %}
