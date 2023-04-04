@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse, redirect
 from django.views.decorators.csrf import csrf_exempt
 
-from app02.models import Department, Employee, Task, Order, Customer
+from app02.models import Department, Employee, Order, Customer
 from django import forms
 from utils.Form import BootStrapForm
 from utils.ModelForm import BootStrapModelForm
@@ -159,29 +159,6 @@ def logout(request):
     return redirect("/login/")
 
 
-class TaskModelForm(BootStrapModelForm):
-    class Meta:
-        model = Task
-        fields = "__all__"
-        widgets = {"detail": forms.TextInput}
-
-
-def task_list(request):
-    form = TaskModelForm()
-    return render(request, "task_list.html", {"form": form})
-
-
-@csrf_exempt
-def task_add(request):
-    form = TaskModelForm(data=request.POST)
-    if form.is_valid():
-        form.save()
-        dct = {"status": True}
-        return HttpResponse(json.dumps(dct))
-    dct = {"status": False, "error": form.errors}
-    return HttpResponse(json.dumps(dct))
-
-
 class OrderModelForm(BootStrapModelForm):
     class Meta:
         model = Order
@@ -276,6 +253,12 @@ def verify(request):
 class VerificationForm(BootStrapForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password'].widget.attrs.update({
+            'placeholder': 'Enter Password'
+        })
 
     def clean_password(self):
         password = self.cleaned_data.get('password')

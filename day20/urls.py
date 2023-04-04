@@ -14,12 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.conf import settings
+from django.views.static import serve
 from app02 import views
 from app03.views import admin_list, admin_add, admin_edit, \
     admin_delete, admin_reset
 
 urlpatterns = [
+    re_path(r'media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}, name='media'),
     path('captcha/', include('captcha.urls')),
     path('admin/', admin.site.urls),
     path('department/list/', views.department_list),
@@ -38,8 +41,6 @@ urlpatterns = [
     path('admin_user/<int:uid>/reset/', admin_reset),
     path('login/', views.login),
     path('logout/', views.logout),
-    path('task/list/', views.task_list),
-    path('task/add/', views.task_add),
     path('order/list/', views.order_list),
     path('order/add/', views.order_add),
     path('order/delete/', views.order_delete),

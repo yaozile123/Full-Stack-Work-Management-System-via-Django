@@ -22,14 +22,6 @@ class Employee(models.Model):
     register_time = models.DateTimeField(verbose_name="Joining Date", default=timezone.now)
 
 
-class Task(models.Model):
-    title = models.CharField(verbose_name="Title", max_length=16)
-    level_choice = ((1, "紧急"), (2, "普通"), (3, "临时"))
-    level = models.SmallIntegerField(verbose_name="Level", choices=level_choice)
-    detail = models.TextField(verbose_name="Details", max_length=200)
-    user = models.ForeignKey(verbose_name="负责人", to="app03.Admin", on_delete=models.CASCADE)
-
-
 class Order(models.Model):
     order_number = models.CharField(verbose_name="Order No.", max_length=64)
     name = models.CharField(verbose_name="Product Name", max_length=12)
