@@ -3,6 +3,17 @@
     <div class="container">
         <div style="margin-bottom: 10px">
             <input type="button" value="Add New Department" class="btn btn-success" id="btnAdd">
+            <div class="col-lg-4" style="float: right">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for..." name="query"
+                               value={{ value }}>
+                        <span class="input-group-btn">
+        <button class="btn btn-default" type="submit">Search</button>
+      </span>
+                    </div>
+                </form>
+            </div>
         </div>
         <div class="panel panel-default">
             <!-- Default panel contents -->
@@ -30,7 +41,25 @@
                 </tbody>
             </table>
         </div>
+        <div class="pagination">
+        <span class="step-links">
+            {% if query_set.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ query_set.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ query_set.number }} of {{ query_set.paginator.num_pages }}.
+            </span>
+
+            {% if query_set.has_next %}
+                <a href="?page={{ query_set.next_page_number }}">next</a>
+                <a href="?page={{ query_set.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+        </div>
     </div>
+
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="alert alert-danger alert-dismissible fade in" role="alert">

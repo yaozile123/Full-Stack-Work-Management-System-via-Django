@@ -18,13 +18,25 @@ from django.core.validators import ValidationError
 from datetime import datetime
 
 # Create your views here.
-PASSWORD = "12345"
+PASSWORD = "12345"  # The password for accessing to admin page
 
 
 def department_list(request):
+    dct = {}
+    data = request.GET.get("query", "")
+    if data:
+        dct["department__contains"] = data
     form = DepartmentModelForm()
-    query_set = Department.objects.all().order_by("id")
-    return render(request, "department_list.html", {'query_set': query_set, "form": form})
+    query_set = Department.objects.filter(**dct).order_by("id")
+    paginator = Paginator(query_set, 20)
+    page = request.GET.get("page")
+    try:
+        result_set = paginator.page(page)
+    except PageNotAnInteger:
+        result_set = paginator.page(1)
+    except EmptyPage:
+        result_set = paginator.page(paginator.num_pages)
+    return render(request, "department_list.html", {'query_set': result_set, "form": form, "value": data})
 
 
 def department_delete(request):
@@ -80,8 +92,20 @@ class DepartmentModelForm(BootStrapModelForm):
 
 
 def user_list(request):
-    query_set = Employee.objects.all()
-    return render(request, "user_list.html", {'query_set': query_set})
+    dct = {}
+    data = request.GET.get("query", "")
+    if data:
+        dct["name__contains"] = data
+    query_set = Employee.objects.filter(**dct).order_by("id")
+    paginator = Paginator(query_set, 20)
+    page = request.GET.get("page")
+    try:
+        result_set = paginator.page(page)
+    except PageNotAnInteger:
+        result_set = paginator.page(1)
+    except EmptyPage:
+        result_set = paginator.page(paginator.num_pages)
+    return render(request, "user_list.html", {'query_set': result_set, 'value': data})
 
 
 class UserModelForm(forms.ModelForm):
