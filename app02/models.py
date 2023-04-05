@@ -12,7 +12,7 @@ class Department(models.Model):
 
 class Employee(models.Model):
     name = models.CharField(verbose_name="Name", max_length=16)
-    pwd = models.CharField(verbose_name="Password", max_length=32)
+    # pwd = models.CharField(verbose_name="Password", max_length=32)
     age = models.IntegerField(verbose_name="Age")
     balance = models.DecimalField(verbose_name="Balance", max_digits=10, decimal_places=2, default=0)
     department = models.ForeignKey(verbose_name="Department", to="Department", to_field="id", blank=True, null=True,

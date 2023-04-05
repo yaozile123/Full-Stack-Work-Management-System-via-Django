@@ -1,6 +1,7 @@
 import json
 import random
 
+from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse, redirect
@@ -347,3 +348,45 @@ def customer_edit(request, uid):
 def customer_delete(request, uid):
     Customer.objects.filter(id=uid).delete()
     return redirect("/customer/list/")
+
+
+@csrf_exempt
+def reset(request):
+    form = ResetModelForm()
+    if request.method == "GET":
+        return render(request, "reset.html", {"form": form})
+    uid = request.session.get('info').get('ID')
+    query_object = Admin.objects.filter(id=uid).first()
+    form = ResetModelForm(instance=query_object, data=request.POST)
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Your password has been updated successfully.')
+        return redirect("/reset/")
+    return render(request, "reset.html", {"form": form})
+
+
+class ResetModelForm(BootStrapModelForm):
+    currentPwd = forms.CharField(label="Current Password", max_length=32, widget=forms.PasswordInput)
+    newPwd = forms.CharField(label="New Password", max_length=32, widget=forms.PasswordInput)
+    confirmPwd = forms.CharField(label="Confirm", max_length=32, widget=forms.PasswordInput)
+
+    class Meta:
+        model = Admin
+        fields = ['currentPwd', 'newPwd', 'confirmPwd']
+
+    def clean_currentPwd(self):
+        pwd = md5(self.cleaned_data.get("currentPwd"))
+        if pwd != self.instance.password:
+            raise ValidationError("Current password is incorrect")
+        return pwd
+
+    def clean_newPwd(self):
+        newPwd = self.cleaned_data.get("newPwd")
+        return md5(newPwd)
+
+    def clean_confirmPwd(self):
+        confirm = self.cleaned_data.get("confirmPwd")
+        if md5(confirm) != self.cleaned_data.get("newPwd"):
+            raise ValidationError("New password and confirmation password do not match")
+        self.instance.password = md5(confirm)
+        return md5(confirm)

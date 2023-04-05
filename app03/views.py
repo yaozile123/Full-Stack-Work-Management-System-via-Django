@@ -29,7 +29,8 @@ def admin_list(request):
 
 
 class AdminModelForm(BootStrapModelForm):
-    confirm = forms.CharField(label="Confirm password")
+    password = forms.CharField(label="Enter password", widget=forms.PasswordInput)
+    confirm = forms.CharField(label="Confirm password", widget=forms.PasswordInput)
 
     class Meta:
         model = Admin
@@ -100,7 +101,8 @@ def admin_edit(request, uid):
 
 class AdminResetForm(BootStrapModelForm):
     # username = forms.CharField(label="管理员账号", widget=forms.TextInput(attrs={'readonly': 'readonly'}))
-    confirm = forms.CharField(label="Confirm Password")
+    password = forms.CharField(label="Enter New Password", widget=forms.PasswordInput)
+    confirm = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
 
     class Meta:
         model = Admin
@@ -129,7 +131,7 @@ def admin_reset(request, uid):
     if request.method == "GET":
         form = AdminResetForm()
         return render(request, "add_edit.html", {"form": form, "title": title})
-    form = AdminResetForm(data=request.POST, instance=row_object)
+    form = AdminResetForm(instance=row_object)
     if form.is_valid():
         form.save()
         return redirect("/admin_user/list/")
