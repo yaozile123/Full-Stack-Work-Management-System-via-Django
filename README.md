@@ -12,6 +12,9 @@ It is designed to streamline task tracking and management, featuring user authen
 - Robust data storage using MySQL
 - Deployment on Amazon Elastic Beanstalk[(Link)](http://djangoenv.eba-43ymgqia.us-west-2.elasticbeanstalk.com/) for seamless scaling, monitoring, and maintenance
 
+## Quick Demo
+[![Alt text](https://img.youtube.com/vi/Z3WxXH5lDoA/0.jpg)](https://www.youtube.com/watch?v=Z3WxXH5lDoA)
+
 ## Getting Started
 
 1. Clone the repository and cd into the project
