@@ -48,4 +48,3 @@ python manage.py migrate
 ```shell
 python manage.py runserver
 ```
-Now, you can access the Work Management System at http://localhost:8000/.
