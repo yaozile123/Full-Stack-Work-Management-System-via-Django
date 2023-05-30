@@ -52,6 +52,6 @@ urlpatterns = [
     path('customer/add/', views.customer_add),
     path('customer/<int:uid>/edit/', views.customer_edit),
     path('customer/<int:uid>/delete/', views.customer_delete),
-    path('reset/', views.reset)
-
+    path('reset/', views.reset),
+    path('', views.mainpage)
 ]

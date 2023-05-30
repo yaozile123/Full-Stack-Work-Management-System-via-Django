@@ -390,3 +390,7 @@ class ResetModelForm(BootStrapModelForm):
             raise ValidationError("New password and confirmation password do not match")
         self.instance.password = md5(confirm)
         return md5(confirm)
+
+
+def mainpage(request):
+    return render(request, "mainpage.html")
