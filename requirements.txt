@@ -39,7 +39,6 @@ PyYAML==5.4.1
 requests==2.26.0
 semantic-version==2.8.5
 six==1.14.0
-sqlclient==21.4.24
 sqlparse==0.4.3
 termcolor==1.1.0
 texttable==1.6.7
